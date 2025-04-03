@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca FCAP</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="/img/ico/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/img/ico/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/img/ico/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/ico/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/img/ico/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/img/ico/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/img/ico/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/img/ico/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/ico/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/img/ico/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/ico/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/ico/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/ico/favicon-16x16.png">
+    <link rel="manifest" href="/img/ico/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/img/ico/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        
+        .background {
+            background-image: url('/img/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100%;
+            position: relative;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100%;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .btn {
+            padding: 12px 20px 12px 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            text-align: left;
+            box-sizing: border-box;
+            width: calc(50% - 8px);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Quando o número de botões for ímpar */
+        .btn:last-child:nth-child(odd) {
+            width: calc(50% - 8px);
+            margin-right: 50%;
+        }
+        
+        /* Efeito de hover animado */
+        .btn:hover {
+            background-color: #45a049;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        /* Ícone dos botões */
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid white;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover .btn-icon {
+            transform: scale(1.1);
+        }
+        
+        .btn-text {
+            flex-grow: 1;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        p {
+            font-size: 1.2em;
+            max-width: 600px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .btn, .btn:last-child:nth-child(odd) {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="overlay"></div>
+        <div class="content">
+            <h1>Biblioteca Professor Leucio Lemos (FCAP)</h1>
+            <p>Bem vindos à página da biblioteca FCAP.</p>
+            
+            <div class="button-container">
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWdfrrpPsY26-RheK2tqWhFgxDKZGdPw539aDiHeON-pqDlQ/viewform?usp=dialog" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico1.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Formulário de cadastro Pergamum</span>
+                </a>
+                <a href="https://dliportal.zbra.com.br/Login.aspx?key=UPE" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico2.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Minha Biblioteca</span>
+                </a>
+                <a href="https://plataforma.bvirtual.com.br/Account/Login?redirectUrl=%2F" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico3.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Biblioteca Virtual</span>
+                </a>
+                <a href="https://www.edupe.upe.br/index.php/catalogo/ebooks-gratuitos" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico4.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Editora UPE</span>
+                </a>
+                <a href="https://proview.thomsonreuters.com/library.html?sponsor=FUDP-2" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico5.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Proview</span>
+                </a>
+                <a href="http://upe.br/anexos/fcap/publicacao.php" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico6.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Revista dos Tribunais</span>
+                </a>
+                <a href="https://periodicos.upe.br/index.php/index/index" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico7.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Portal de Periódicos UPE</span>
+                </a>
+                <a href="https://www-periodicos-capes-gov-br.ez371.periodicos.capes.gov.br/index.php" class="btn" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/ico8.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">Portal de Periódicos CAPES</span>
+                </a>
+                <!-- <a href="#">
+                    <img src="/img/ico9.png" class="btn-icon" alt="Ícone">
+                    <span class="btn-text">DynaMed</span>
+                </a> -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
