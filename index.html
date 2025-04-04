@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca FCAP</title>
+    <!-- Favicons com caminhos relativos -->
     <link rel="apple-touch-icon" sizes="57x57" href="img/ico/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="img/ico/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="img/ico/apple-icon-72x72.png">
@@ -13,7 +14,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="img/ico/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="img/ico/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="img/ico/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="img/ico/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="img/ico/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/ico/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="img/ico/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="img/ico/favicon-16x16.png">
@@ -21,194 +22,8 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="img/ico/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-        }
-        
-        .background {
-            background-image: url('img/background.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100%;
-            position: relative;
-        }
-        
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-        
-        .content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100%;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-            max-width: 800px;
-            width: 100%;
-        }
-        
-        .btn-wrapper {
-            position: relative;
-            width: calc(50% - 8px);
-            transition: transform 0.3s ease;
-        }
-        
-        /* Quando o número de botões for ímpar */
-        .btn-wrapper:last-child:nth-child(odd) {
-            width: calc(50% - 8px);
-        }
-        
-        .btn {
-            padding: 12px 20px 12px 15px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            text-align: left;
-            box-sizing: border-box;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-        
-        .btn-description {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background-color: rgba(69, 160, 73, 0.9);
-            color: white;
-            padding: 15px;
-            border-radius: 0 0 25px 25px;
-            box-sizing: border-box;
-            font-size: 14px;
-            transform: translateY(-10px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 2;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            pointer-events: none;
-        }
-        
-        .btn-wrapper:hover {
-            z-index: 10;
-        }
-        
-        .btn-wrapper:hover .btn {
-            border-radius: 25px 25px 0 0;
-            background-color: #45a049;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        .btn-wrapper:hover .btn-description {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        /* Ajusta a posição dos botões abaixo na mesma coluna */
-        .btn-wrapper:hover ~ .btn-wrapper:nth-child(even) {
-            transform: translateY(var(--desc-height));
-        }
-        
-        .btn-wrapper:hover ~ .btn-wrapper:nth-child(odd) {
-            transform: translateY(var(--desc-height));
-        }
-        
-        /* Ícone dos botões */
-        .btn-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            border: 2px solid white;
-            transition: transform 0.3s ease;
-        }
-        
-        .btn:hover .btn-icon {
-            transform: scale(1.1);
-        }
-        
-        .btn-text {
-            flex-grow: 1;
-        }
-        
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        
-        p {
-            font-size: 1.2em;
-            max-width: 600px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Responsividade */
-        @media (max-width: 600px) {
-            .btn-wrapper, .btn-wrapper:last-child:nth-child(odd) {
-                width: 100%;
-            }
-            
-            .btn-wrapper:hover ~ .btn-wrapper {
-                transform: translateY(var(--desc-height));
-            }
-            
-            /* Estilos específicos para mobile */
-            .btn-wrapper.mobile-open .btn-description {
-                transform: translateY(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
-            
-            .btn-wrapper.mobile-open .btn {
-                border-radius: 25px 25px 0 0;
-                background-color: #45a049;
-            }
-            
-            .btn-wrapper.mobile-open ~ .btn-wrapper {
-                transform: translateY(var(--desc-height));
-            }
-            
-            .btn-description {
-                pointer-events: none;
-            }
-        }
-    </style>
+    <!-- CSS com caminho relativo -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div class="background">
@@ -292,99 +107,7 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnWrappers = document.querySelectorAll('.btn-wrapper');
-            let maxDescHeight = 0;
-            let currentOpen = null;
-            let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            
-            // Calcula a altura máxima de descrição
-            btnWrappers.forEach(wrapper => {
-                const description = wrapper.querySelector('.btn-description');
-                
-                description.style.display = 'block';
-                description.style.position = 'absolute';
-                description.style.visibility = 'hidden';
-                
-                const descHeight = description.offsetHeight;
-                if (descHeight > maxDescHeight) {
-                    maxDescHeight = descHeight;
-                }
-                
-                description.style.display = '';
-                description.style.position = '';
-                description.style.visibility = '';
-            });
-            
-            document.documentElement.style.setProperty('--desc-height', maxDescHeight + 'px');
-            
-            // Verifica se é mobile
-            function isMobile() {
-                return window.matchMedia("(max-width: 600px)").matches;
-            }
-            
-            // Manipulador de eventos para mobile/touch
-            if (isTouchDevice) {
-                btnWrappers.forEach(wrapper => {
-                    const btn = wrapper.querySelector('.btn');
-                    const description = wrapper.querySelector('.btn-description');
-                    
-                    wrapper.addEventListener('click', function(e) {
-                        // Se já está aberto e clicou no botão, segue o link após pequeno delay
-                        if (wrapper === currentOpen && e.target.closest('.btn')) {
-                            setTimeout(() => {
-                                if (btn.href) {
-                                    window.open(btn.href, btn.target || '_self');
-                                }
-                            }, 300);
-                            return;
-                        }
-                        
-                        // Fecha o atual se houver
-                        if (currentOpen) {
-                            currentOpen.classList.remove('mobile-open');
-                        }
-                        
-                        // Abre o novo se não for o mesmo
-                        if (wrapper !== currentOpen) {
-                            wrapper.classList.add('mobile-open');
-                            currentOpen = wrapper;
-                            e.preventDefault();
-                        } else {
-                            currentOpen = null;
-                        }
-                    });
-                });
-                
-                // Fecha a descrição ao tocar fora
-                document.addEventListener('click', function(e) {
-                    if (!e.target.closest('.btn-wrapper') && currentOpen) {
-                        currentOpen.classList.remove('mobile-open');
-                        currentOpen = null;
-                    }
-                });
-                
-                // Atualiza quando a janela é redimensionada
-                window.addEventListener('resize', function() {
-                    if (!isMobile() && currentOpen) {
-                        currentOpen.classList.remove('mobile-open');
-                        currentOpen = null;
-                    }
-                });
-            } else {
-                // Comportamento hover para desktop
-                btnWrappers.forEach(wrapper => {
-                    wrapper.addEventListener('mouseenter', function() {
-                        this.style.zIndex = '10';
-                    });
-                    
-                    wrapper.addEventListener('mouseleave', function() {
-                        this.style.zIndex = '';
-                    });
-                });
-            }
-        });
-    </script>
+    <!-- JavaScript com caminho relativo -->
+    <script src="js/script.js"></script>
 </body>
 </html>
