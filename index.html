@@ -187,6 +187,26 @@
             .btn-wrapper:hover ~ .btn-wrapper {
                 transform: translateY(var(--desc-height));
             }
+            
+            /* Estilos específicos para mobile */
+            .btn-wrapper.mobile-open .btn-description {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+            
+            .btn-wrapper.mobile-open .btn {
+                border-radius: 25px 25px 0 0;
+                background-color: #45a049;
+            }
+            
+            .btn-wrapper.mobile-open ~ .btn-wrapper {
+                transform: translateY(var(--desc-height));
+            }
+            
+            .btn-description {
+                pointer-events: none;
+            }
         }
     </style>
 </head>
@@ -217,7 +237,7 @@
                         <img src="img/ico/ico2.png" class="btn-icon" alt="Ícone">
                         <span class="btn-text">Minha Biblioteca</span>
                     </a>
-                    <div class="btn-description">Acesse sua conta na biblioteca virtual. Utilize seu e-mail institucional e a senha padrão da NBID </div>
+                    <div class="btn-description">Acesse sua conta na biblioteca virtual. Utilize seu e-mail institucional e a senha padrão da NBID</div>
                 </div>
                 <div class="btn-wrapper">
                     <a href="https://plataforma.bvirtual.com.br/Account/Login?redirectUrl=%2F" class="btn" target="_blank" rel="noopener noreferrer">
@@ -275,14 +295,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const btnWrappers = document.querySelectorAll('.btn-wrapper');
-            
-            // Calcula a altura máxima de descrição para consistência
             let maxDescHeight = 0;
+            let currentOpen = null;
+            let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
+            // Calcula a altura máxima de descrição
             btnWrappers.forEach(wrapper => {
                 const description = wrapper.querySelector('.btn-description');
                 
-                // Mostra temporariamente para calcular a altura
                 description.style.display = 'block';
                 description.style.position = 'absolute';
                 description.style.visibility = 'hidden';
@@ -292,14 +312,78 @@
                     maxDescHeight = descHeight;
                 }
                 
-                // Esconde novamente
                 description.style.display = '';
                 description.style.position = '';
                 description.style.visibility = '';
             });
             
-            // Aplica a altura máxima a todos os botões
             document.documentElement.style.setProperty('--desc-height', maxDescHeight + 'px');
+            
+            // Verifica se é mobile
+            function isMobile() {
+                return window.matchMedia("(max-width: 600px)").matches;
+            }
+            
+            // Manipulador de eventos para mobile/touch
+            if (isTouchDevice) {
+                btnWrappers.forEach(wrapper => {
+                    const btn = wrapper.querySelector('.btn');
+                    const description = wrapper.querySelector('.btn-description');
+                    
+                    wrapper.addEventListener('click', function(e) {
+                        // Se já está aberto e clicou no botão, segue o link após pequeno delay
+                        if (wrapper === currentOpen && e.target.closest('.btn')) {
+                            setTimeout(() => {
+                                if (btn.href) {
+                                    window.open(btn.href, btn.target || '_self');
+                                }
+                            }, 300);
+                            return;
+                        }
+                        
+                        // Fecha o atual se houver
+                        if (currentOpen) {
+                            currentOpen.classList.remove('mobile-open');
+                        }
+                        
+                        // Abre o novo se não for o mesmo
+                        if (wrapper !== currentOpen) {
+                            wrapper.classList.add('mobile-open');
+                            currentOpen = wrapper;
+                            e.preventDefault();
+                        } else {
+                            currentOpen = null;
+                        }
+                    });
+                });
+                
+                // Fecha a descrição ao tocar fora
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.btn-wrapper') && currentOpen) {
+                        currentOpen.classList.remove('mobile-open');
+                        currentOpen = null;
+                    }
+                });
+                
+                // Atualiza quando a janela é redimensionada
+                window.addEventListener('resize', function() {
+                    if (!isMobile() && currentOpen) {
+                        currentOpen.classList.remove('mobile-open');
+                        currentOpen = null;
+                    }
+                });
+            } else {
+                // Comportamento hover para desktop
+                btnWrappers.forEach(wrapper => {
+                    wrapper.addEventListener('mouseenter', function() {
+                        this.style.zIndex = '10';
+                    });
+                    
+                    wrapper.addEventListener('mouseleave', function() {
+                        this.style.zIndex = '';
+                    });
+                });
+            }
         });
     </script>
 </body>
