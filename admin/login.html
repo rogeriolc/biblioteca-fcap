@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Admin - FCAP</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; }
+    .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
+    input[type="password"] { width: 100%; padding: 10px; margin-bottom: 10px; }
+    button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+    .error { color: red; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Admin FCAP</h2>
+    <input type="password" id="senha" placeholder="Digite a senha">
+    <button onclick="login()">Entrar</button>
+    <div id="error" class="error"></div>
+  </div>
+  <script src="../js/script-login.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerar Hash SHA-256</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
+    input, button, textarea { width: 100%; padding: 10px; margin-top: 10px; }
+    label { font-weight: bold; display: block; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Gerador de Hash SHA-256</h1>
+  <label for="senha">Digite a senha:</label>
+  <input type="text" id="senha" placeholder="Ex: admin123">
+  <button onclick="gerarHash()">Gerar Hash</button>
+
+  <label for="saida">Hash SHA-256:</label>
+  <textarea id="saida" rows="3" readonly></textarea>
+
+  <script>
+    async function gerarHash() {
+      const senha = document.getElementById("senha").value;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(senha);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+      document.getElementById("saida").value = hashHex;
+    }
+  </script>
+</body>
+</html>
