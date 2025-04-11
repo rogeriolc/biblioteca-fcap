@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const salvar = document.getElementById("botaoSalvar");
   const exportar = document.getElementById("exportar");
   const publicar = document.getElementById("publicar");
+  const repo = "bibliotecafcap/site-biblioteca"
 
   const tituloInput = document.getElementById("novoTitulo");
   const urlInput = document.getElementById("novoUrl");
@@ -66,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   publicar.addEventListener("click", async () => {
-    const repo = prompt("Repositório (ex: rogeriolc/biblioteca-fcap):");
+    //const repo = prompt("Repositório (ex: rogeriolc/biblioteca-fcap):");
     const token = prompt("Token GitHub:");
 
     if (!repo || !token) return alert("Dados inválidos.");
@@ -131,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const nomeArquivo = titulo.replace(/\s+/g, "").toLowerCase() + ".png";
       const base64Data = reader.result.split(",")[1];
 
-      const repo = prompt("Repositório para enviar imagem:");
+      //const repo = prompt("Repositório para enviar imagem:");
       const token = prompt("Token GitHub:");
 
       const apiUrl = `https://api.github.com/repos/${repo}/contents/img/ico/${nomeArquivo}`;
