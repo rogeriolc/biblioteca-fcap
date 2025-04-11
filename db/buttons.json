@@ -14,7 +14,7 @@
       "url": "https://pergamum.upe.br",
       "icon": "img/ico/ico9.png",
       "description": "Acesse a plataforma Pergamum para a pesquisa de livros e renovação de livros emprestados.",
-      "order": 2
+      "order": 3
     },
     {
       "id": 3,
@@ -22,7 +22,7 @@
       "url": "https://dliportal.zbra.com.br/Login.aspx?key=UPE",
       "icon": "img/ico/ico2.png",
       "description": "Acesse sua conta na biblioteca virtual. Utilize seu e-mail institucional e a senha padrão da NBID",
-      "order": 3
+      "order": 5
     },
     {
       "id": 4,
@@ -38,7 +38,7 @@
       "url": "https://www.edupe.upe.br/index.php/catalogo/ebooks-gratuitos",
       "icon": "img/ico/ico4.png",
       "description": "Explore as publicações acadêmicas e e-books gratuitos da Editora da Universidade de Pernambuco.",
-      "order": 5
+      "order": 8
     },
     {
       "id": 6,
@@ -54,7 +54,7 @@
       "url": "https://proview.thomsonreuters.com/library.html?sponsor=FUDP-2",
       "icon": "img/ico/ico5.png",
       "description": "Plataforma de livros digitais técnicos e acadêmicos da Thomson Reuters.",
-      "order": 7
+      "order": 9
     },
     {
       "id": 8,
@@ -62,7 +62,7 @@
       "url": "http://upe.br/anexos/fcap/publicacao.php",
       "icon": "img/ico/ico6.png",
       "description": "Acesso a artigos e publicações jurídicas da Revista dos Tribunais.",
-      "order": 8
+      "order": 2
     },
     {
       "id": 9,
@@ -70,7 +70,7 @@
       "url": "https://periodicos.upe.br/index.php/index/index",
       "icon": "img/ico/ico7.png",
       "description": "Periódicos acadêmicos publicados pela Universidade de Pernambuco.",
-      "order": 9
+      "order": 10
     },
     {
       "id": 10,
@@ -78,7 +78,7 @@
       "url": "https://www-periodicos-capes-gov-br.ez371.periodicos.capes.gov.br/index.php",
       "icon": "img/ico/ico8.png",
       "description": "Acesso a milhares de periódicos científicos através do portal CAPES.",
-      "order": 10
+      "order": 7
     }
   ]
 }
