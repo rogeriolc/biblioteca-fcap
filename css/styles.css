@@ -215,3 +215,101 @@ p {
     background-color: rgba(255, 255, 255, 0.5);
     z-index: 3;
 }
+/* Botões de ação na lista de botões do admin */
+.actions {
+    display: flex;
+    gap: 6px;
+  }
+  
+  .actions button {
+    padding: 4px 6px;
+    font-size: 14px;
+    width: auto;
+    height: 30px;
+    line-height: 1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .actions .edit {
+    background: #ffc107;
+    color: black;
+    border: none;
+  }
+  
+  .actions .delete {
+    background: #f44336;
+    color: white;
+    border: none;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 10px;
+  }
+  
+  input, button, select, textarea {
+    padding: 8px;
+    width: 100%;
+    margin-top: 5px;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+    background: #fff;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .actions button {
+    padding: 4px 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .actions .edit {
+    background: #ffd966;
+    border: none;
+  }
+  
+  .actions .delete {
+    background: #f44336;
+    color: white;
+    border: none;
+  }
+  
+  #criarBox {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+  
+  #previewCrop {
+    max-width: 100%;
+    max-height: 300px;
+    margin-top: 10px;
+    display: none;
+  }
+  
