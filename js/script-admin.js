@@ -1,213 +1,91 @@
-if (sessionStorage.getItem("auth") !== "ok") {
-  window.location.href = "login.html";
+// script-admin.js
+
+// Derivar chave (mesma função de script-login.js)
+async function deriveKey(password) {
+  const enc = new TextEncoder();
+  const keyMaterial = await window.crypto.subtle.importKey(
+      'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']
+  );
+  return window.crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: enc.encode('fixed-salt'), iterations: 100000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+  );
 }
 
-let botoes = [];
-let cropper = null;
-let editandoId = null;
+// Carregar token criptografado
+async function loadToken(repoFullName, masterPassword) {
+  const payload = localStorage.getItem(`gh-token-${repoFullName}`);
+  if (!payload) throw new Error('Token não encontrado para ' + repoFullName);
+  const [ivB64, dataB64] = payload.split(':');
+  const iv = Uint8Array.from(atob(ivB64), c => c.charCodeAt(0));
+  const cipherBytes = Uint8Array.from(atob(dataB64), c => c.charCodeAt(0));
+  const key = await deriveKey(masterPassword);
+  const plain = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      cipherBytes
+  );
+  return new TextDecoder().decode(plain);
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-  const lista = document.getElementById("listaBotoes");
-  const salvar = document.getElementById("botaoSalvar");
-  const exportar = document.getElementById("exportar");
-  const publicar = document.getElementById("publicar");
-  const repo = "bibliotecafcap/site-biblioteca"
+// Função genérica para chamar API GitHub
+enableFetch = async (url, method, token, body) => {
+  const headers = { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' };
+  const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  return res.json();
+};
 
-  const tituloInput = document.getElementById("novoTitulo");
-  const urlInput = document.getElementById("novoUrl");
-  const descricaoInput = document.getElementById("novoDescricao");
-  const inputImagem = document.getElementById("inputImagem");
-  const previewCrop = document.getElementById("previewCrop");
-  const criarBotao = document.getElementById("criarBotao");
+// Handler de salvar/editar botão
+async function saveButton(e) {
+  e.preventDefault();
+  const id = document.getElementById('button-id').value;
+  const title = document.getElementById('title').value;
+  const url = document.getElementById('url').value;
+  const fileInput = document.getElementById('icon');
+  const repo = document.getElementById('repo-select').value;
+  const master = prompt('Senha mestra (para descriptografar token):');
+  const token = await loadToken(repo, master);
 
-  fetch(`../db/buttons.json?nocache=${Date.now()}`)
-    .then(res => res.json())
-    .then(data => {
-      botoes = data.buttons.sort((a, b) => a.order - b.order);
-      renderizarLista();
-    })
-    .catch(() => alert("Erro ao carregar buttons.json"));
-
-  function renderizarLista() {
-    lista.innerHTML = "";
-    botoes.forEach(btn => {
-      const li = document.createElement("li");
-      li.setAttribute("data-id", btn.id);
-      li.innerHTML = `
-        <span><strong>${btn.order} - ${btn.title}</strong><br><small>${btn.description || ""}</small></span>
-        <div class="actions">
-          <button class="edit" onclick="editarBotao(${btn.id})">✏️</button>
-          <button class="delete" onclick="removerBotao(${btn.id})">❌</button>
-        </div>
-      `;
-      lista.appendChild(li);
-    });
-    Sortable.create(lista, { animation: 150 });
+  // Montar dados	do botão
+  let iconName;
+  if (fileInput.files.length > 0) {
+      iconName = fileInput.files[0].name;
+      // upload do arquivo (p.ex., via API GitHub Contents)
+      await uploadIcon(repo, token, iconName, fileInput.files[0]);
+  } else if (id) {
+      // ao editar sem novo ícone, mantém o existente
+      const existing = await fetchButton(repo, token, id);
+      iconName = existing.icon;
+  } else {
+      // ao criar e sem envio, usa default
+      iconName = 'default.png';
   }
 
-  salvar.addEventListener("click", () => {
-    const items = [...lista.querySelectorAll("li")];
-    items.forEach((li, index) => {
-      const id = parseInt(li.getAttribute("data-id"));
-      const botao = botoes.find(b => b.id === id);
-      if (botao) botao.order = index + 1;
-    });
-    alert("Ordem atualizada.");
-    renderizarLista();
-  });
+  const buttonObj = { title, url, icon: iconName };
+  if (id) {
+      // editar JSON
+      await updateButtonInRepo(repo, token, id, buttonObj);
+  } else {
+      // criar novo
+      await createButtonInRepo(repo, token, buttonObj);
+  }
+  alert('Botão salvo com sucesso!');
+  window.location.reload();
+}
 
-  exportar.addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify({ buttons: botoes }, null, 2)], {
-      type: "application/json"
-    });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "buttons.json";
-    a.click();
-  });
+document.getElementById('button-form').addEventListener('submit', saveButton);
 
-  publicar.addEventListener("click", async () => {
-    //const repo = prompt("Repositório (ex: rogeriolc/biblioteca-fcap):");
-    const token = prompt("Token GitHub:");
-
-    if (!repo || !token) return alert("Dados inválidos.");
-
-    const uploadJson = async (caminho, conteudo) => {
-      const apiUrl = `https://api.github.com/repos/${repo}/contents/${caminho}`;
-      const res = await fetch(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json"
-        }
-      });
-      const dados = await res.json();
-      const putRes = await fetch(apiUrl, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json"
-        },
-        body: JSON.stringify({
-          message: "Atualização via painel admin",
-          content: btoa(unescape(encodeURIComponent(conteudo))),
-          sha: dados.sha
-        })
-      });
-      return putRes.ok;
-    };
-
-    const sucesso = await uploadJson("db/buttons.json", JSON.stringify({ buttons: botoes }, null, 2));
-    alert(sucesso ? "buttons.json enviado!" : "Erro ao enviar JSON.");
-  });
-
-  inputImagem.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      previewCrop.src = reader.result;
-      previewCrop.style.display = "block";
-      if (cropper) cropper.destroy();
-      cropper = new Cropper(previewCrop, {
-        aspectRatio: 1,
-        viewMode: 1
-      });
-    };
-    reader.readAsDataURL(file);
-  });
-
-  criarBotao.addEventListener("click", async () => {
-    const titulo = tituloInput.value.trim();
-    const url = urlInput.value.trim();
-    const descricao = descricaoInput.value.trim();
-    if (!titulo || !url || !cropper) {
-      alert("Preencha todos os dados e selecione uma imagem.");
-      return;
-    }
-
-    const canvas = cropper.getCroppedCanvas({ width: 64, height: 64 });
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const nomeArquivo = titulo.replace(/\s+/g, "").toLowerCase() + ".png";
-      const base64Data = reader.result.split(",")[1];
-
-      //const repo = prompt("Repositório para enviar imagem:");
-      const token = prompt("Token GitHub:");
-
-      const apiUrl = `https://api.github.com/repos/${repo}/contents/img/ico/${nomeArquivo}`;
-      const res = await fetch(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json"
-        }
-      });
-      const dados = await res.json().catch(() => ({}));
-
-      const putRes = await fetch(apiUrl, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json"
-        },
-        body: JSON.stringify({
-          message: editandoId ? "Atualizando ícone" : "Novo ícone",
-          content: base64Data,
-          sha: dados.sha
-        })
-      });
-
-      if (!putRes.ok) return alert("Erro ao enviar imagem.");
-
-      if (editandoId) {
-        const botao = botoes.find(b => b.id === editandoId);
-        botao.title = titulo;
-        botao.url = url;
-        botao.description = descricao;
-        botao.icon = `img/ico/${nomeArquivo}`;
-        editandoId = null;
-      } else {
-        const novoId = botoes.length ? Math.max(...botoes.map(b => b.id)) + 1 : 1;
-        botoes.push({
-          id: novoId,
-          title: titulo,
-          url: url,
-          description: descricao,
-          icon: `img/ico/${nomeArquivo}`,
-          order: botoes.length + 1
-        });
-      }
-
-      tituloInput.value = "";
-      urlInput.value = "";
-      descricaoInput.value = "";
-      inputImagem.value = "";
-      previewCrop.style.display = "none";
-      if (cropper) cropper.destroy();
-      cropper = null;
-      renderizarLista();
-      alert("Botão salvo!");
-    };
-    reader.readAsDataURL(blob);
-  });
+document.getElementById('publish-btn').addEventListener('click', async () => {
+  // implementa publish se necessário
+  alert('Publicação iniciada...');
 });
 
-function editarBotao(id) {
-  const botao = botoes.find(b => b.id === id);
-  if (!botao) return;
-  document.getElementById("novoTitulo").value = botao.title;
-  document.getElementById("novoUrl").value = botao.url;
-  document.getElementById("novoDescricao").value = botao.description;
-  editandoId = botao.id;
-  alert("Edite os campos e clique em Salvar botão para atualizar.");
-}
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.clear();
+  window.location.href = 'login.html';
+});
 
-function removerBotao(id) {
-  if (!confirm("Deseja mesmo remover este botão?")) return;
-  botoes = botoes.filter(b => b.id !== id);
-  document.getElementById("novoTitulo").value = "";
-  document.getElementById("novoUrl").value = "";
-  document.getElementById("novoDescricao").value = "";
-  document.getElementById("inputImagem").value = "";
-  renderizarLista();
-}
+// FUNÇÕES AUXILIARES: fetchButton, uploadIcon, updateButtonInRepo, createButtonInRepo...

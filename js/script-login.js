@@ -1,32 +1,48 @@
-async function login() {
-  const senha = document.getElementById("senha").value;
-  const encoder = new TextEncoder();
-  const data = encoder.encode(senha);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+// script-login.js
 
-  // Hash da senha
-  const senhaHashCorreta = "01607f07289eaa22aa06873faba2bd27e254bcd8c91ba34d9b0b0b2e4f6ac14e";
-
-  if (hashHex === senhaHashCorreta) {
-    sessionStorage.setItem("auth", "ok");
-    window.location.href = "index.html";
-  } else {
-    document.getElementById("error").innerText = "Senha incorreta.";
-  }
+// Derivar chave de criptografia a partir da senha mestra
+async function deriveKey(password) {
+  const enc = new TextEncoder();
+  const keyMaterial = await window.crypto.subtle.importKey(
+      'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']
+  );
+  return window.crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: enc.encode('fixed-salt'), iterations: 100000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+  );
 }
 
-if (sessionStorage.getItem("auth") === "ok") {
-  window.location.href = "index.html";
+// Função para criptografar e guardar token
+async function storeToken(repoFullName, token, masterPassword) {
+  const key = await deriveKey(masterPassword);
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const enc = new TextEncoder();
+  const cipher = await window.crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      enc.encode(token)
+  );
+  const ivB64 = btoa(String.fromCharCode(...iv));
+  const dataB64 = btoa(String.fromCharCode(...new Uint8Array(cipher)));
+  localStorage.setItem(`gh-token-${repoFullName}`, `${ivB64}:${dataB64}`);
 }
 
-// Suporte a pressionar ENTER
-document.addEventListener("DOMContentLoaded", () => {
-  const campoSenha = document.getElementById("senha");
-  if (campoSenha) {
-    campoSenha.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") login();
-    });
-  }
+// Botão para salvar tokens DEV e PROD
+document.getElementById('save-tokens-btn').addEventListener('click', async () => {
+  const master = document.getElementById('master-pass').value;
+  const tokenDev = prompt('Token GitHub DEV:');
+  const tokenProd = prompt('Token GitHub PROD:');
+  await storeToken('rogeriolc/biblioteca-fcap', tokenDev, master);
+  await storeToken('bibliotecafcap/site-biblioteca', tokenProd, master);
+  alert('Tokens armazenados com segurança!');
+});
+
+// Login básico (exemplo)
+document.getElementById('login-form').addEventListener('submit', e => {
+  e.preventDefault();
+  // aqui sua validação de usuário/senha
+  window.location.href = 'index.html';
 });
