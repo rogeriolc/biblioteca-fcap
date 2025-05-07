@@ -312,4 +312,52 @@ p {
     margin-top: 10px;
     display: none;
   }
+  /* Container de login */
+.login-container {
+    width: 320px;
+    margin: 100px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  /* Form controls */
+  .form-control, .form-control-file, select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 15px;
+    box-sizing: border-box;
+  }
+  
+  /* Botões */
+  .btn {
+    display: inline-block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .btn.secondary {
+    background: #eee;
+  }
+  .logout {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+  }
+  
+  /* Agrupamento de campos */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  /* Ações do formulário (duas colunas se quiser) */
+  .form-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .form-actions .btn {
+    flex: 1;
+  }
   
