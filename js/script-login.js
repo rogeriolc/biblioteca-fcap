@@ -1,24 +1,32 @@
-// script-login.js
+async function login() {
+  const senha = document.getElementById("senha").value;
+  const encoder = new TextEncoder();
+  const data = encoder.encode(senha);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-// Tokens fornecidos no chat
-const TOKENS = {
-  'rogeriolc/biblioteca-fcap': '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',
-  'bibliotecafcap/site-biblioteca': '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'
-};
+  // Hash da senha
+  const senhaHashCorreta = "01607f07289eaa22aa06873faba2bd27e254bcd8c91ba34d9b0b0b2e4f6ac14e";
 
-document.getElementById('login-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const user = document.getElementById('username').value.trim();
-  const pass = document.getElementById('password').value.trim();
-
-  // Ajuste aqui suas credenciais
-  if (user === 'admin' && pass === 'admin123') {
-    // Armazena tokens no LocalStorage
-    Object.entries(TOKENS).forEach(([repo, token]) => {
-      localStorage.setItem(`gh-token-${repo}`, token);
-    });
-    window.location.href = 'index.html';
+  if (hashHex === senhaHashCorreta) {
+    sessionStorage.setItem("auth", "ok");
+    window.location.href = "index.html";
   } else {
-    alert('Usuário ou senha incorretos.');
+    document.getElementById("error").innerText = "Senha incorreta.";
+  }
+}
+
+if (sessionStorage.getItem("auth") === "ok") {
+  window.location.href = "index.html";
+}
+
+// Suporte a pressionar ENTER
+document.addEventListener("DOMContentLoaded", () => {
+  const campoSenha = document.getElementById("senha");
+  if (campoSenha) {
+    campoSenha.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") login();
+    });
   }
 });

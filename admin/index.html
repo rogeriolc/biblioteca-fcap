@@ -1,60 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Painel Admin - Biblioteca FCAP</title>
-  <link rel="stylesheet" href="../css/styles.css"/>
-  <script>
-    // Se não estiver logado, manda para o login
-    if (
-      !localStorage.getItem('gh-token-rogeriolc/biblioteca-fcap') &&
-      !localStorage.getItem('gh-token-bibliotecafcap/site-biblioteca')
-    ) {
-      window.location.replace('login.html');
-    }
-  </script>
+  <meta charset="UTF-8" />
+  <title>Admin FCAP</title>
+  <link rel="stylesheet" href="../css/styles.css?v=1.0.0">
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet" />
+  
 </head>
 <body>
-  <header>
-    <h1>Administração da Biblioteca FCAP</h1>
-    <button id="logout-btn" class="btn logout">Sair</button>
-  </header>
+  <h1>Organizar Botões</h1>
 
-  <main>
-    <form id="button-form">
-      <input type="hidden" id="button-id" />
+  <ul id="listaBotoes"></ul>
+  <button id="botaoSalvar">Salvar Ordem</button>
+  <button id="exportar">Exportar JSON</button>
+  <button id="publicar">Publicar no GitHub</button>
 
-      <div class="form-group">
-        <label for="title">Título:</label>
-        <input type="text" id="title" class="form-control" required />
-      </div>
+  <div id="criarBox">
+    <h2 id="formTitle">Criar novo botão</h2>
+    <div class="form-group"><input type="text" id="novoTitulo" placeholder="Título do botão" /></div>
+    <div class="form-group"><input type="url" id="novoUrl" placeholder="URL do botão" /></div>
+    <div class="form-group"><textarea id="novoDescricao" rows="2" placeholder="Descrição do botão"></textarea></div>
+    <div class="form-group"><input type="file" id="inputImagem" accept="image/*" /></div>
+    <img id="previewCrop" />
+    <button id="criarBotao">Salvar botão</button>
+  </div>
 
-      <div class="form-group">
-        <label for="url">URL:</label>
-        <input type="url" id="url" class="form-control" required />
-      </div>
-
-      <div class="form-group">
-        <label for="icon">Ícone:</label>
-        <input type="file" id="icon" accept="image/*" class="form-control-file" />
-      </div>
-
-      <div class="form-group">
-        <label for="repo-select">Publicar em:</label>
-        <select id="repo-select" class="form-control">
-          <option value="rogeriolc/biblioteca-fcap">DEV (biblioteca-fcap)</option>
-          <option value="bibliotecafcap/site-biblioteca">PROD (site-biblioteca)</option>
-        </select>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" id="save-btn" class="btn">Salvar</button>
-        <button type="button" id="publish-btn" class="btn secondary">Publicar</button>
-      </div>
-    </form>
-  </main>
-
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
   <script src="../js/script-admin.js"></script>
 </body>
 </html>
