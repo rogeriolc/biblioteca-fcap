@@ -11,7 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const salvar = document.getElementById("botaoSalvar");
   const exportar = document.getElementById("exportar");
   const publicar = document.getElementById("publicar");
-  const repo = "bibliotecafcap/site-biblioteca"
+
+  const repoSelect = document.getElementById("repo-select");
+  const repoInfo = document.getElementById("repo-info");
+
+  function updateRepoInfo() {
+    const selected = repoSelect.options[repoSelect.selectedIndex];
+    repoInfo.textContent = `Repositório selecionado: ${selected.value}`;
+  }
+  updateRepoInfo();
+  repoSelect.addEventListener("change", updateRepoInfo);
 
   const tituloInput = document.getElementById("novoTitulo");
   const urlInput = document.getElementById("novoUrl");
@@ -28,63 +37,30 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(() => alert("Erro ao carregar buttons.json"));
 
-  function renderizarLista() {
-    lista.innerHTML = "";
-    botoes.forEach(btn => {
-      const li = document.createElement("li");
-      li.setAttribute("data-id", btn.id);
-      li.innerHTML = `
-        <span><strong>${btn.order} - ${btn.title}</strong><br><small>${btn.description || ""}</small></span>
-        <div class="actions">
-          <button class="edit" onclick="editarBotao(${btn.id})">✏️</button>
-          <button class="delete" onclick="removerBotao(${btn.id})">❌</button>
-        </div>
-      `;
-      lista.appendChild(li);
-    });
-    Sortable.create(lista, { animation: 150 });
-  }
-
-  salvar.addEventListener("click", () => {
-    const items = [...lista.querySelectorAll("li")];
-    items.forEach((li, index) => {
-      const id = parseInt(li.getAttribute("data-id"));
-      const botao = botoes.find(b => b.id === id);
-      if (botao) botao.order = index + 1;
-    });
-    alert("Ordem atualizada.");
-    renderizarLista();
-  });
-
-  exportar.addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify({ buttons: botoes }, null, 2)], {
-      type: "application/json"
-    });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "buttons.json";
-    a.click();
-  });
-
   publicar.addEventListener("click", async () => {
-    //const repo = prompt("Repositório (ex: rogeriolc/biblioteca-fcap):");
-    const token = prompt("Token GitHub:");
+    let githubToken = localStorage.getItem("githubToken");
+    if (!githubToken) {
+      githubToken = prompt("Token GitHub:");
+      if (githubToken) localStorage.setItem("githubToken", githubToken);
+    }
 
-    if (!repo || !token) return alert("Dados inválidos.");
+    const repo = repoSelect.value;
+    if (!repo || !githubToken) return alert("Dados inválidos.");
 
     const uploadJson = async (caminho, conteudo) => {
-      const apiUrl = `https://api.github.com/repos/${repo}/contents/${caminho}`;
+      const apiUrl = `https://api.github.com/repos/ ${repo}/contents/${caminho}`;
       const res = await fetch(apiUrl, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${githubToken}`,
           Accept: "application/vnd.github+json"
         }
       });
       const dados = await res.json();
+
       const putRes = await fetch(apiUrl, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${githubToken}`,
           Accept: "application/vnd.github+json"
         },
         body: JSON.stringify({
@@ -100,114 +76,91 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(sucesso ? "buttons.json enviado!" : "Erro ao enviar JSON.");
   });
 
-  inputImagem.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      previewCrop.src = reader.result;
-      previewCrop.style.display = "block";
-      if (cropper) cropper.destroy();
-      cropper = new Cropper(previewCrop, {
-        aspectRatio: 1,
-        viewMode: 1
-      });
-    };
-    reader.readAsDataURL(file);
-  });
-
   criarBotao.addEventListener("click", async () => {
     const titulo = tituloInput.value.trim();
     const url = urlInput.value.trim();
     const descricao = descricaoInput.value.trim();
-    if (!titulo || !url || !cropper) {
-      alert("Preencha todos os dados e selecione uma imagem.");
+
+    if (!titulo || !url) {
+      alert("Preencha todos os campos obrigatórios.");
       return;
     }
 
-    const canvas = cropper.getCroppedCanvas({ width: 64, height: 64 });
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const nomeArquivo = titulo.replace(/\s+/g, "").toLowerCase() + ".png";
-      const base64Data = reader.result.split(",")[1];
+    let nomeArquivo;
 
-      //const repo = prompt("Repositório para enviar imagem:");
-      const token = prompt("Token GitHub:");
+    if (editandoId && !inputImagem.files.length) {
+      const botao = botoes.find(b => b.id === editandoId);
+      nomeArquivo = botao.icon.split('/').pop();
+    } else if (!inputImagem.files.length && !editandoId) {
+      alert("Selecione uma imagem.");
+      return;
+    }
 
-      const apiUrl = `https://api.github.com/repos/${repo}/contents/img/ico/${nomeArquivo}`;
-      const res = await fetch(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json"
-        }
-      });
-      const dados = await res.json().catch(() => ({}));
+    if (cropper) {
+      const canvas = cropper.getCroppedCanvas({ width: 64, height: 64 });
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result.split(",")[1];
+        nomeArquivo = titulo.replace(/\s+/g, "").toLowerCase() + ".png";
 
-      const putRes = await fetch(apiUrl, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json"
-        },
-        body: JSON.stringify({
-          message: editandoId ? "Atualizando ícone" : "Novo ícone",
-          content: base64Data,
-          sha: dados.sha
-        })
-      });
+        const token = prompt("Token GitHub:");
+        if (!token) return alert("Token inválido.");
 
-      if (!putRes.ok) return alert("Erro ao enviar imagem.");
-
-      if (editandoId) {
-        const botao = botoes.find(b => b.id === editandoId);
-        botao.title = titulo;
-        botao.url = url;
-        botao.description = descricao;
-        botao.icon = `img/ico/${nomeArquivo}`;
-        editandoId = null;
-      } else {
-        const novoId = botoes.length ? Math.max(...botoes.map(b => b.id)) + 1 : 1;
-        botoes.push({
-          id: novoId,
-          title: titulo,
-          url: url,
-          description: descricao,
-          icon: `img/ico/${nomeArquivo}`,
-          order: botoes.length + 1
+        const apiUrl = `https://api.github.com/repos/ ${repoSelect.value}/contents/img/ico/${nomeArquivo}`;
+        const res = await fetch(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/vnd.github+json"
+          }
         });
-      }
+        const dados = await res.json().catch(() => ({}));
 
-      tituloInput.value = "";
-      urlInput.value = "";
-      descricaoInput.value = "";
-      inputImagem.value = "";
-      previewCrop.style.display = "none";
-      if (cropper) cropper.destroy();
-      cropper = null;
-      renderizarLista();
-      alert("Botão salvo!");
-    };
-    reader.readAsDataURL(blob);
+        const putRes = await fetch(apiUrl, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/vnd.github+json"
+          },
+          body: JSON.stringify({
+            message: editandoId ? "Atualizando ícone" : "Novo ícone",
+            content: base64Data,
+            sha: dados.sha
+          })
+        });
+
+        if (!putRes.ok) return alert("Erro ao enviar imagem.");
+
+        if (editandoId) {
+          const botao = botoes.find(b => b.id === editandoId);
+          botao.title = titulo;
+          botao.url = url;
+          botao.description = descricao;
+          botao.icon = `img/ico/${nomeArquivo}`;
+          editandoId = null;
+        } else {
+          const novoId = botoes.length ? Math.max(...botoes.map(b => b.id)) + 1 : 1;
+          botoes.push({
+            id: novoId,
+            title: titulo,
+            url: url,
+            description: descricao,
+            icon: `img/ico/${nomeArquivo}`,
+            order: botoes.length + 1
+          });
+        }
+
+        tituloInput.value = "";
+        urlInput.value = "";
+        descricaoInput.value = "";
+        inputImagem.value = "";
+        previewCrop.style.display = "none";
+        if (cropper) cropper.destroy();
+        cropper = null;
+        renderizarLista();
+        alert("Botão salvo!");
+      };
+      reader.readAsDataURL(blob);
+    }
   });
 });
-
-function editarBotao(id) {
-  const botao = botoes.find(b => b.id === id);
-  if (!botao) return;
-  document.getElementById("novoTitulo").value = botao.title;
-  document.getElementById("novoUrl").value = botao.url;
-  document.getElementById("novoDescricao").value = botao.description;
-  editandoId = botao.id;
-  alert("Edite os campos e clique em Salvar botão para atualizar.");
-}
-
-function removerBotao(id) {
-  if (!confirm("Deseja mesmo remover este botão?")) return;
-  botoes = botoes.filter(b => b.id !== id);
-  document.getElementById("novoTitulo").value = "";
-  document.getElementById("novoUrl").value = "";
-  document.getElementById("novoDescricao").value = "";
-  document.getElementById("inputImagem").value = "";
-  renderizarLista();
-}

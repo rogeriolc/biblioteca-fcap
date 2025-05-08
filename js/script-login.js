@@ -7,7 +7,7 @@ async function login() {
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
   // Hash da senha
-  const senhaHashCorreta = "01607f07289eaa22aa06873faba2bd27e254bcd8c91ba34d9b0b0b2e4f6ac14e";
+  const senhaHashCorreta = "d5279a1432c511e09e9636496cb33b2a0fa263b4a5f9d3262e08ef82106cd9d9";
 
   if (hashHex === senhaHashCorreta) {
     sessionStorage.setItem("auth", "ok");
