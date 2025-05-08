@@ -1,6 +1,6 @@
 // /fcap/js/script.js
 document.addEventListener("DOMContentLoaded", () => {
-    fetch("db/buttons.json")
+  fetch(`db/buttons.json?nocache=${Date.now()}`)
       .then((response) => response.json())
       .then((data) => {
         const container = document.getElementById("button-container");
