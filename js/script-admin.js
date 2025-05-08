@@ -33,13 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewCrop = document.getElementById("previewCrop");
   const criarBotao = document.getElementById("criarBotao");
 
-  // Caminho absoluto baseado na URL atual
-  const basePath = window.location.pathname.startsWith("/fcap/")
-    ? "/fcap"
-    : "";
-
-  // Carregar buttons.json com validação detalhada
-  fetch(`${basePath}/db/buttons.json?nocache=${Date.now()}`, { cache: "no-store" })
+    // Carregar buttons.json com validação detalhada
+  fetch(`../db/buttons.json?nocache=${Date.now()}`, { cache: "no-store" })
     .then(res => {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       return res.text(); // Primeiro pega como texto
